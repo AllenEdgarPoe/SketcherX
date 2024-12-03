@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SketcherX</title>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -147,9 +148,12 @@
                   <div class="slider-container">
                     <button class="slider-button prev" onclick="moveSlide(-1)">&#10094;</button>
                     <div class="slider" id="slider">
-                      <img src="images/1.jpg" alt="Image 1">
-                      <img src="images/2.jpg" alt="Image 2">
-                      <img src="images/3.jpg" alt="Image 3">
+                      <img src="images/5.jpg" alt="Image 1">
+                      <img src="images/4.jpg" alt="Image 2">
+                      <img src="images/1.jpg" alt="Image 3">
+                      <img src="images/2.jpg" alt="Image 4">
+                      <img src="images/3.jpg" alt="Image 5">
+                      <img src="images/6.png" alt="Image 6">
                     </div>
                     <button class="slider-button next" onclick="moveSlide(1)">&#10095;</button>
                   </div>
@@ -188,8 +192,79 @@
         <p>We introduce SketcherX, a novel robotic system for personalized portrait drawing through interactive human-robot engagement. Unlike traditional robotic art systems based on analog printing techniques, SketcherX captures facial images, processes them, and generates vectorized portraits in a distinctive, human-like artistic style. The system comprises two 6-axis robotic arms : a face robot, which is equipped with a head-mounted camera and Large Language Model (LLM) for real-time interaction, and a drawing robot, utilizing a fine-tuned Stable Diffusion model, ControlNet, and Vision-Language models for dynamic, stylized drawing. Our contributions include the development of a custom Vector Low Rank Adaptation model (LoRA), enabling seamless adaptation to various artistic styles, and integrating a pair-wise fine-tuning approach to enhance stroke quality and stylistic accuracy. Experimental results demonstrate the system's ability to produce high-quality, personalized portraits within two minutes, highlighting its potential as a new paradigm in robotic creativity. This work advances the field of robotic art by positioning robots as active participants in the creative process, paving the way for future explorations in interactive, human-robot artistic collaboration.</p>
     </section>
     <section id="Method">
-        <h2>Method</h2>
-        <p>Caption for the figure above...</p>
+        <h2>Overall of Drawing Process</h2>
+        <div class="image-container">
+          <img class="method-image" src="images/overalldrawing.png" alt="Image 7">
+        </div>
+        <p>
+          <strong>Human Feature Extraction</strong> : Using the Canny edge preprocessor, its encoded latent vector \( c_{f} \) is fed into ControlNet.
+            Simultaneously, a Vision Language model generates textual descriptions of the user’s attributes,
+            which are encoded by the CLIP text encoder into \( c_{t} \).
+        </p>
+        <p>
+            <strong>Merge for Clear Vectorized Line </strong> : The initialized latent vector \( z_{t} \), which is the output of the diffusion process of the encoded
+            image of \( x_0 \), is processed through the text-to-image model with a LoRA merge of Vector LoRA
+            and Style LoRA, producing vector-friendly strokes while maintaining the desired artistic style.
+        </p>
+
+        <h2>Pair-wise Fine-tuning with context consistency loss</h2>
+          <div class="image-container">
+            <img class="method-image" src="images/loss.png" alt="Image 8">
+          </div>
+        <div class="image-container">
+            <img class="method-image" src="images/lossfunction.png" alt="Image 9">
+          </div>
+          <p>
+            <strong>Training Data</strong> : Pairs of (Style Images \( x_{\text{style}} \), Regularization Images \( x_{\text{reg}} \)).
+          </p>
+          <p>
+            <strong>Reconstruction Loss (\( L_{\text{rec}} \))</strong> : Trained on the ground-truth image during the reverse diffusion process.
+          </p>
+          <p>
+            <strong>Context Consistency Loss (\( L_{\text{con}} \))</strong> : L2 loss between pairwise data. \( x_{\text{style}} \) is the generated style image conditioned with the text prompt
+            “[description] + [unique identifier]”, and \( x_{\text{reg}} \) is the generated regularization image conditioned with
+            the text prompt “[description]”. This ensures that the content (face features, etc.) between the created style image and the reconstructed image
+            is well-preserved, allowing the model to learn only the differences in drawing style.
+        </p>
+          </p>
+    </section>
+    <section id="lora merging">
+        <h2>LoRA Merging of Vector LoRA and Style LoRA</h2>
+        <div class="image-container">
+            <img class="method-image" src="images/compare.png" alt="Image 10">
+        </div>
+        <p>
+            When merged with Vector LoRA, each style is preserved but transformed into clean, vector-friendly strokes. Using only the Style LoRAs results in distorted SVG shapes unsuitable for robotic drawing. However, combining them with Vector LoRA produces clean, continuous strokes, ideal for robotic drawing.
+        </p>
+        <div class="image-container">
+            <img class="method-image" src="images/variousstyle.png" alt="Image 11">
+        </div>
+        <p>SVG output of four different artistic styles. Each column indicates different model inference outputs, which the model’s weight was updated with different combination of (Style LoRA + Vector LoRA). </p>
+    </section>
+    <section>
+        <h2>BibTex</h2>
+        <pre><code>
+@article{song2024sketcherx,
+  title={SketcherX: AI-Driven Interactive Robotic drawing with Diffusion model and Vectorization Techniques},
+  author={Song, Jookyung and Kang, Mookyoung and Kwak, Nojun},
+  journal={arXiv preprint arXiv:2409.15292},
+  year={2024}
+}
+        </code></pre>
+    <style>
+    pre {
+        background-color: #f4f4f4;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        overflow-x: auto; /* Adds horizontal scroll if content overflows */
+    }
+    code {
+        font-family: "Courier New", Courier, monospace;
+        color: #333;
+    }
+</style>
+
     </section>
     <footer>
         <p>© AllenEdgarPoe| <a href="https://github.com/AllenEdgarPoe">Github Profile</a></p>
