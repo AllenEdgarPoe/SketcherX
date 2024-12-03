@@ -174,4 +174,18 @@ footer a:hover {
     }
 }
 
+pre {
+    background-color: #f8f9fa; /* Light gray background for better readability */
+    padding: 15px; /* Padding around the content */
+    border-radius: 5px; /* Rounded corners */
+    border: 1px solid #ddd; /* Light border */
+    overflow-x: auto; /* Horizontal scroll for long lines */
+    font-size: 1rem; /* Slightly larger font for better readability */
+    max-width: 800px; /* Align with the rest of the content width */
+    margin: 20px auto; /* Center align */
+}
 
+code {
+    font-family: "Courier New", Courier, monospace; /* Monospaced font for code */
+    color: #333; /* Dark text for readability */
+}
